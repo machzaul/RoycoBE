@@ -100,21 +100,20 @@ router.get('/:identifier', (req: Request, res: Response) => {
     }
     .btn {
       width: 100%;
-      height: 52px;
+      height: 48px;
       border: 0;
       border-radius: 9999px;
-      font-size: 16px;
-      font-weight: 900;
+      font-size: 14.5px;
+      font-weight: 800;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
+      gap: 8px;
       cursor: pointer;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
       transition: transform 0.1s ease, filter 0.15s ease;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
       text-decoration: none;
+      letter-spacing: -0.1px;
     }
     .btn:active {
       transform: scale(0.98);
@@ -134,9 +133,9 @@ router.get('/:identifier', (req: Request, res: Response) => {
       background-color: #f7f7f7;
     }
     .btn svg {
-      width: 20px;
-      height: 20px;
-      stroke-width: 2.8;
+      width: 18px;
+      height: 18px;
+      stroke-width: 2.6;
       flex-shrink: 0;
     }
     .footer {
@@ -238,24 +237,49 @@ router.get('/:identifier', (req: Request, res: Response) => {
     }
 
     async function shareCard() {
-      const shareData = {
-        title: "Love Language: ${card.title} - Royco x AADC",
-        text: "Love language masakan aku adalah ${card.title}! Yuk cek bahasa cinta kamu di Royco x AADC ❤️",
-        url: window.location.href
-      };
-      if (navigator.share) {
-        try {
-          await navigator.share(shareData);
-        } catch(e) {}
-      } else {
-        try {
-          await navigator.clipboard.writeText(window.location.href);
-          const shareText = document.getElementById("shareText");
-          shareText.textContent = "Link Tersalin! ✓";
-          setTimeout(() => { shareText.textContent = "Bagikan Ke Orang Tersayang"; }, 2000);
-        } catch(err) {
-          prompt("Salin link untuk berbagi:", window.location.href);
+      const imgUrl = "${card.image}";
+      const shareTitle = "Love Language: ${card.title} - Royco x AADC";
+      const shareText = "Love language masakan aku adalah ${card.title}! Yuk cari tahu bahasa cintamu di Royco x AADC ❤️";
+      const shareBtnText = document.getElementById("shareText");
+
+      try {
+        if (shareBtnText) shareBtnText.textContent = "Menyiapkan...";
+        const res = await fetch(imgUrl);
+        const blob = await res.blob();
+        const file = new File([blob], "Royko-LoveLanguage-${card.slug}.png", { type: "image/png" });
+
+        // If device supports sharing files directly (WhatsApp, IG Stories, Telegram, etc)
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            files: [file],
+            title: shareTitle,
+            text: shareText,
+          });
+          return;
+        } else if (navigator.share) {
+          await navigator.share({
+            title: shareTitle,
+            text: shareText,
+            url: window.location.href,
+          });
+          return;
         }
+      } catch (err) {
+        if (err.name === 'AbortError') return;
+        console.warn('Share file fallback:', err);
+      } finally {
+        if (shareBtnText) shareBtnText.textContent = "Bagikan Ke Orang Tersayang";
+      }
+
+      // Fallback clipboard for desktop browsers
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        if (shareBtnText) {
+          shareBtnText.textContent = "Link Tersalin! ✓";
+          setTimeout(() => { shareBtnText.textContent = "Bagikan Ke Orang Tersayang"; }, 2000);
+        }
+      } catch (err) {
+        prompt("Salin link untuk berbagi:", window.location.href);
       }
     }
   </script>
