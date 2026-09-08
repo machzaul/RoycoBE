@@ -17,11 +17,23 @@ router.get('/:identifier', (req: Request, res: Response) => {
   <meta property="og:description" content="${card.subTitle}">
   <meta property="og:image" content="${card.image}">
   <style>
+    @font-face {
+      font-family: 'Isidora';
+      src: url('/Font/Fonts/Isidora-SemiBold.otf') format('opentype');
+      font-weight: 600;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'Isidora';
+      src: url('/Font/Fonts/Isidora-Black.otf') format('opentype');
+      font-weight: 900;
+      font-display: swap;
+    }
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     body {
       background-color: #E50012;
       color: #FFFFFF;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-family: 'Isidora', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       min-height: 100vh;
       min-height: 100dvh;
       display: flex;
@@ -29,6 +41,7 @@ router.get('/:identifier', (req: Request, res: Response) => {
       justify-content: space-between;
       overflow-x: hidden;
     }
+    button { font-family: inherit; }
     .stripe-bar {
       width: 100%;
       height: 8px;
