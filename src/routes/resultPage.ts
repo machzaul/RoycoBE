@@ -133,27 +133,6 @@ router.get('/:identifier', (req: Request, res: Response) => {
       user-select: auto;
       cursor: pointer;
     }
-    .card-hint {
-      margin-top: 10px;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: rgba(0, 0, 0, 0.22);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      padding: 6px 14px;
-      border-radius: 9999px;
-      font-size: 11.5px;
-      font-weight: 700;
-      color: rgba(255, 255, 255, 0.95);
-      letter-spacing: -0.1px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-    }
-    .card-hint svg {
-      width: 14px;
-      height: 14px;
-      flex-shrink: 0;
-      color: #FFC700;
-    }
     .actions {
       width: 100%;
       max-width: 350px;
@@ -575,13 +554,6 @@ router.get('/:identifier', (req: Request, res: Response) => {
       <img id="cardImg" src="${card.image}" alt="${card.title}" />
     </div>
 
-    <div class="card-hint">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"/>
-      </svg>
-      <span>Tips: Tekan lama gambar kartu untuk <b>Simpan ke Galeri Foto</b></span>
-    </div>
-
     <div class="actions">
       <!-- Download / Save to Gallery Button -->
       <button class="btn btn-download" onclick="downloadCard()">
@@ -827,7 +799,7 @@ router.get('/:identifier', (req: Request, res: Response) => {
 
         // Metode 2: Download standar via browser (Di Android otomatis terindeks oleh Galeri/Google Photos)
         triggerBlobDownload(blob);
-        showToast("✓ Kartu berhasil diunduh! Tekan lama gambar kartu untuk simpan langsung ke Galeri Foto.", 4000);
+        showToast("✓ Kartu berhasil disimpan ke galeri!", 3000);
       } catch (e) {
         window.open(imgUrl, "_blank");
       } finally {
