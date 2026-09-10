@@ -1,20 +1,17 @@
-# RoycoBE
+# RoycoBE - Card & Mobile Scan Result Server
 
-Server backend REST API mandiri untuk **Royko x AADC - Eggspresi Cinta** menggunakan **Express.js**, **TypeScript**, dan **Prisma ORM** yang terhubung ke **PostgreSQL 18** (`royko_aadc`).
+Server backend mandiri untuk **Royko x AADC - Eggspresi Cinta**. Bertugas melayani halaman hasil kuis saat pengunjung melakukan scan QR Code melalui smartphone (`/result/:slug`), download kartu PNG resolusi tinggi, berbagi kartu ke media sosial, serta menyajikan aset statis (gambar kartu & font resmi Isidora).
+
+> **Catatan Kiosk:** Seluruh pendaftaran peserta, pengerjaan kuis, penyimpanan data lokal, ekspor Excel, dan pencetakan struk termal (Blueprint BP-Q58D) ditangani secara offline langsung oleh aplikasi Kiosk (`FE`). Backend ini tidak memerlukan koneksi printer maupun database.
 
 ## 🛠️ Tech Stack
 - **Runtime**: Node.js & TypeScript
 - **Framework**: Express.js
-- **Database**: PostgreSQL 18
-- **ORM**: Prisma ORM
+- **Assets**: Static font Isidora & HD Card PNGs
 
 ## ⚙️ Konfigurasi .env
 ```env
 PORT=5000
-DATABASE_URL="postgresql://postgres:machzaul@localhost:5432/royko_aadc?schema=public"
-ADMIN_PASSWORD="adminpass123"
-PRINTER_NAME="Blueprint BP-Q58D"
-CLIENT_URL="http://localhost:3000"
 ```
 
 ## 🚀 Cara Menjalankan
@@ -22,26 +19,23 @@ CLIENT_URL="http://localhost:3000"
 # 1. Masuk ke direktori BE
 cd BE
 
-# 2. Install dependencies (atau gunakan shared node_modules)
+# 2. Install dependencies
 npm install
 
-# 3. Sinkronkan skema Prisma (opsional jika sudah dilakukan di root)
-npm run prisma:generate
-
-# 4. Jalankan mode development
+# 3. Jalankan mode development
 npm run dev
+
+# 4. Atau build & start untuk produksi
+npm run build
+npm start
 ```
 
 Server akan aktif di `http://localhost:5000`.
 
 ## 📡 Daftar Endpoints
 - `GET /health`: Healthcheck status server.
-- `GET /api/quizzes/active`: Mengambil kuis & pertanyaan yang sedang aktif.
-- `POST /api/sessions/start`: Registrasi peserta & generate token sesi kuis.
-- `POST /api/sessions/submit`: Kirim jawaban kuis, hitung love language, & assign antrean.
-- `GET /api/sessions/result/:token`: Ambil hasil kuis via token QR code.
-- `POST /api/sessions/print`: Cetak struk termal Blueprint BP-Q58D.
-- `GET /api/cards`: Daftar 5 kartu Love Language statis.
-- `GET /api/cards/:identifier`: Detail kartu berdasarkan ID (1-5) atau slug (acts-of-service, etc.).
-- `GET /api/admin/analytics/summary`: Statistik total peserta & konversi.
-- `GET /api/admin/analytics/distribution`: Distribusi hasil love language.
+- `GET /result/:identifier`: Halaman web mobile hasil kuis (misal `/result/acts-of-service`) lengkap dengan tombol Download PNG & modal Share Sosial Media.
+- `GET /api/cards`: Daftar 5 kartu Love Language statis (JSON).
+- `GET /api/cards/:identifier`: Detail kartu spesifik berdasarkan ID (1-5) atau slug.
+- `GET /`: Redirect otomatis ke `/result/acts-of-service`.
+

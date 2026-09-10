@@ -37,72 +37,40 @@ sudo npm install -g pm2
 
 ---
 
-## 3. Install & Konfigurasi PostgreSQL di VPS
-```bash
-sudo apt install -y postgresql postgresql-contrib
-sudo systemctl start postgresql
-sudo systemctl enable postgresql
-```
-
-Buat user dan database untuk kuis:
-```bash
-# Masuk ke prompt postgres
-sudo -u postgres psql
-
-# Di dalam prompt PostgreSQL:
-CREATE USER postgres WITH PASSWORD 'machzaul';
-CREATE DATABASE royko_aadc OWNER postgres;
-GRANT ALL PRIVILEGES ON DATABASE royko_aadc TO postgres;
-\q
-```
-
----
-
-## 4. Upload / Clone Kode `BE/` ke VPS
+## 3. Upload / Clone Kode `BE/` ke VPS
 Anda bisa clone via Git atau copy folder `BE` ke `/var/www/royko-be`:
 ```bash
 sudo mkdir -p /var/www/royko-be
 sudo chown -R $USER:$USER /var/www/royko-be
 cd /var/www/royko-be
 
-# Copy atau git clone file BE ke direktori ini
+# Copy atau git clone repository BE ke direktori ini
 ```
 
 ---
 
-## 5. Konfigurasi `.env` di VPS
+## 4. Konfigurasi `.env` di VPS
 Buat file `.env` di `/var/www/royko-be/.env`:
 ```env
 PORT=5000
-DATABASE_URL="postgresql://postgres:machzaul@localhost:5432/royko_aadc?schema=public"
-ADMIN_PASSWORD="adminpass123"
-PRINTER_NAME="Blueprint BP-Q58D"
-CLIENT_URL="*"
 ```
 
 ---
 
-## 6. Install Dependencies, Build, & Seed Data
+## 5. Install Dependencies & Build
 ```bash
 cd /var/www/royko-be
 
 # 1. Install dependencies
 npm install
 
-# 2. Generate Prisma Client & Push skema database
-npm run prisma:generate
-npm run prisma:push
-
-# 3. Seed data kuis (5 Pertanyaan & 5 Kartu Love Language)
-npm run prisma:seed
-
-# 4. Build TypeScript ke JavaScript produksi
+# 2. Build TypeScript ke JavaScript produksi
 npm run build
 ```
 
 ---
 
-## 7. Jalankan Backend dengan PM2
+## 6. Jalankan Backend dengan PM2
 ```bash
 cd /var/www/royko-be
 pm2 start ecosystem.config.js
@@ -113,7 +81,7 @@ pm2 startup
 
 ---
 
-## 8. Konfigurasi Nginx (Reverse Proxy) & Domain
+## 7. Konfigurasi Nginx (Reverse Proxy) & Domain
 Buat file konfigurasi Nginx:
 ```bash
 sudo nano /etc/nginx/sites-available/royko-be
@@ -148,7 +116,7 @@ sudo systemctl restart nginx
 
 ---
 
-## 9. Pasang SSL Gratis (HTTPS Let's Encrypt)
+## 8. Pasang SSL Gratis (HTTPS Let's Encrypt)
 ```bash
 sudo apt install -y certbot python3-certbot-nginx
 sudo certbot --nginx -d api.domainanda.com
@@ -157,7 +125,7 @@ Pilih opsi redirect HTTP ke HTTPS otomatis.
 
 ---
 
-## 10. Hubungkan FE Kiosk Offline ke VPS Online
+## 9. Hubungkan FE Kiosk Offline ke VPS Online
 Di laptop/PC Kiosk event, buka file `FE/.env` dan ubah:
 ```env
 NEXT_PUBLIC_ONLINE_URL="https://api.domainanda.com"
