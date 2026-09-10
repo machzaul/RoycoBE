@@ -5,11 +5,8 @@
   "main": "dist/index.js",
   "scripts": {
     "dev": "node node_modules/tsx/dist/cli.mjs watch src/index.ts",
-    "build": "tsc",
-    "start": "node dist/index.js",
-    "prisma:generate": "node node_modules/prisma/build/index.js generate",
-    "prisma:push": "node node_modules/prisma/build/index.js db push",
-    "prisma:seed": "node node_modules/tsx/dist/cli.mjs prisma/seed.ts"
+    "build": "node node_modules/typescript/bin/tsc",
+    "start": "node dist/index.js"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
