@@ -38,8 +38,10 @@ app.get('/', (_req, res) => {
   res.redirect('/result/acts-of-service');
 });
 
-app.listen(PORT, () => {
-  console.log(`🚀 Standalone Backend server is running at http://localhost:${PORT}`);
-});
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`🚀 Standalone Backend server is running at http://localhost:${PORT}`);
+  });
+}
 
 export default app;
