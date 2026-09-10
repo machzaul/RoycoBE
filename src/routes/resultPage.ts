@@ -128,8 +128,31 @@ router.get('/:identifier', (req: Request, res: Response) => {
       width: 100%;
       height: auto;
       display: block;
-      pointer-events: none;
-      user-select: none;
+      pointer-events: auto;
+      -webkit-touch-callout: default !important;
+      user-select: auto;
+      cursor: pointer;
+    }
+    .card-hint {
+      margin-top: 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(0, 0, 0, 0.22);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 6px 14px;
+      border-radius: 9999px;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.95);
+      letter-spacing: -0.1px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+    .card-hint svg {
+      width: 14px;
+      height: 14px;
+      flex-shrink: 0;
+      color: #FFC700;
     }
     .actions {
       width: 100%;
@@ -552,13 +575,20 @@ router.get('/:identifier', (req: Request, res: Response) => {
       <img id="cardImg" src="${card.image}" alt="${card.title}" />
     </div>
 
+    <div class="card-hint">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"/>
+      </svg>
+      <span>Tips: Tekan lama gambar kartu untuk <b>Simpan ke Galeri Foto</b></span>
+    </div>
+
     <div class="actions">
-      <!-- Download Button -->
+      <!-- Download / Save to Gallery Button -->
       <button class="btn btn-download" onclick="downloadCard()">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
         </svg>
-        <span id="downloadText">Download Hasil Kartu</span>
+        <span id="downloadText">Simpan ke Galeri Foto</span>
       </button>
 
       <!-- Share Button (Opens Social Share Sheet) -->
@@ -753,27 +783,55 @@ router.get('/:identifier', (req: Request, res: Response) => {
       if (e.key === "Escape") closeShareModal();
     });
 
+    function triggerBlobDownload(blob) {
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "Royko-LoveLanguage-${card.slug}.png";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => window.URL.revokeObjectURL(url), 6000);
+    }
+
     async function downloadCard() {
       const imgUrl = "${card.image}";
       const btnText = document.getElementById("downloadText");
-      btnText.textContent = "Mengunduh...";
-      showToast("Sedang mengunduh hasil kartu...", 2000);
+      btnText.textContent = "Menyiapkan...";
+      showToast("Menyiapkan kartu ke galeri...", 1500);
       try {
         const res = await fetch(imgUrl);
         const blob = await res.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "Royko-LoveLanguage-${card.slug}.png";
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
-        showToast("✓ Kartu berhasil disimpan ke galeri!");
+        const file = new File([blob], "Royko-LoveLanguage-${card.slug}.png", { type: "image/png" });
+
+        // Metode 1: Web Share API dengan File (Standar resmi browser HP iOS & Android untuk Simpan ke Galeri Foto)
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          try {
+            showToast("Pilih 'Simpan Gambar' di menu HP untuk langsung masuk ke Galeri Foto 📸", 4000);
+            await navigator.share({
+              files: [file],
+              title: "Love Language: ${card.title}",
+              text: "Kartu Love Language Royco x AADC"
+            });
+            showToast("✓ Kartu berhasil disimpan!");
+            return;
+          } catch (err) {
+            // Jika user membatalkan menu share, tetap unduh file via browser sebagai cadangan
+            if (err && err.name === 'AbortError') {
+              triggerBlobDownload(blob);
+              showToast("✓ Kartu diunduh ke penyimpanan HP");
+              return;
+            }
+          }
+        }
+
+        // Metode 2: Download standar via browser (Di Android otomatis terindeks oleh Galeri/Google Photos)
+        triggerBlobDownload(blob);
+        showToast("✓ Kartu berhasil diunduh! Tekan lama gambar kartu untuk simpan langsung ke Galeri Foto.", 4000);
       } catch (e) {
         window.open(imgUrl, "_blank");
       } finally {
-        btnText.textContent = "Download Hasil Kartu";
+        btnText.textContent = "Simpan ke Galeri Foto";
       }
     }
 
